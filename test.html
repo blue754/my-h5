@@ -1,0 +1,2458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>端午安康</title>
+    <style>
+        /* 通用样式 */
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+            background-image: url('./素材/加载页面背景图.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
+        
+        .page-container {
+            text-align: center;
+            width: 90%;
+            max-width: 800px;
+            display: none;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 10px;
+            box-sizing: border-box;
+        }
+        
+        .page-title {
+            color: #2e7d32;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+        
+        .btn {
+            background-color: #2e7d32;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            min-width: 120px;
+        }
+        
+        .btn:hover {
+            background-color: #1b5e20;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+        }
+
+        /* 加载页面样式 */
+        .progress-container {
+            width: 100%;
+            height: 40px;
+            background-color: #c8e6c9;
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 15px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #4caf50;
+            transition: width 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+        
+        .loading-text {
+            margin-top: 15px;
+            color: #2e7d32;
+            font-style: italic;
+            min-height: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .complete-message {
+            display: none;
+            color: #2e7d32;
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+        }
+
+        /* 端午来源页面样式 */
+        .origin-kitchen-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            margin: 20px 0;
+        }
+
+        .origin-kitchen-bg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* 卡片容器样式 */
+        .origin-card-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 15px;
+            width: 90%;
+            max-width: 600px;
+            height: 80%;
+            aspect-ratio: 1/1; /* 确保容器也是正方形 */
+        }
+
+        /* 卡片样式 */
+        .origin-card {
+            position: relative;
+            perspective: 1000px;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .origin-card-front,
+        .origin-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            transition: transform 0.6s;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            box-sizing: border-box;
+            aspect-ratio: 1/1; /* 确保卡片是正方形 */
+            overflow: hidden; /* 隐藏超出部分 */
+        }
+
+        .origin-card-front {
+            background-color: #fff;
+            z-index: 2;
+        }
+
+        .origin-card-front img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* 保持图片比例并填满容器 */
+            border-radius: 6px;
+        }
+
+        .origin-card-back {
+            background-color: #f8f8f8;
+            transform: rotateY(180deg);
+            z-index: 1;
+            color: #2e7d32;
+            font-size: 0.9rem;
+            text-align: center;
+            padding: 15px;
+        }
+
+        .origin-card.flipped .origin-card-front {
+            transform: rotateY(180deg);
+        }
+
+        .origin-card.flipped .origin-card-back {
+            transform: rotateY(360deg);
+        }
+
+        .view-hint {
+            color: #2e7d32;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+            font-style: italic;
+        }
+
+        /* 制作粽子页面样式 */
+        .make-zongzi-page {
+            width: 100%;
+            max-width: 800px;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .make-title {
+            color: #2e7d32;
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+        }
+        
+        .make-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .make-step {
+            width: 90%;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s ease;
+        }
+        
+        .make-step.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .step-img {
+            width: 100%;
+            max-width: 250px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+        }
+        
+        .step-title {
+            color: #2e7d32;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+        
+        .step-desc {
+            color: #555;
+            font-size: 0.9rem;
+        }
+        
+        /* 厨房场景样式 */
+        .kitchen-background {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            margin: 15px auto;
+        }
+
+        .kitchen-background img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* 锅的位置 */
+        .pot-area {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px dashed #ccc;
+        }
+
+        /* 粽叶初始位置 */
+        .zongye-origin {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            left: 8%;
+            top: 56%;
+        }
+
+        .zongye {
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            touch-action: manipulation;
+        }
+
+        /* 锅盖样式 */
+        .pot-cover {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            left: 52%;
+            top: 54%;
+            transform: translate(-50%, -50%);
+            display: none;
+        }
+        
+        /* 提示信息 */
+        .timer-message {
+            position: absolute;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.8);
+            padding: 8px 15px;
+            border-radius: 15px;
+            display: none;
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+
+        /* 按钮样式 */
+        .take-out-btn, .next-step-btn {
+            position: absolute;
+            bottom: 15px;
+            display: none;
+            font-size: 0.9rem;
+            padding: 10px 20px;
+        }
+
+        .take-out-btn {
+            left: 30%;
+        }
+
+        .next-step-btn {
+            right: 30%;
+        }
+        
+        /* 提示框样式 */
+        .hint-container {
+            margin: 15px auto;
+            max-width: 90%;
+            text-align: center;
+        }
+
+        .hint-trigger {
+            color: #2e7d32;
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 6px 12px;
+            background-color: rgba(46, 125, 50, 0.1);
+            border-radius: 15px;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .hint-trigger:hover {
+            background-color: rgba(46, 125, 50, 0.2);
+        }
+
+        .hint-content {
+            display: none;
+            margin-top: 8px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            color: #2e7d32;
+            font-size: 0.8rem;
+        }
+        
+        /* 制作粽子第二步样式 */
+        .make-step2-page {
+            width: 100%;
+            max-width: 800px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .ingredient-area {
+            position: absolute;
+            top: 60%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            width: 20%;
+            flex-wrap: nowrap;
+        }
+
+        .ingredient {
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .ingredient:hover {
+            transform: scale(1.1);
+        }
+
+        /* 调整圆框容器样式 */
+        .zongzi-container {
+            position: absolute;
+            bottom: 5%;
+            left: 35%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 100px;
+            border: 2px dashed #ccc;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 调整第二个圆框样式 */
+        .zongzi-container-2 {
+            position: absolute;
+            bottom: 5%;
+            left: 65%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 100px;
+            border: 2px dashed #ccc;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .zongzi-container-2 img {
+            width: 70px;
+            height: 70px;
+            object-fit: contain;
+        }
+
+        /* 包扎粽子页面样式 */
+        .wrap-zongzi-page {
+            width: 100%;
+            max-width: 800px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .selected-ingredients {
+            position: absolute;
+            left: 5%;
+            top: 65%;
+            transform: translateY(-50%);
+            width: 80%;
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        /* 调整材料图片大小 */
+        .selected-ingredients .ingredient {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            margin: 3px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        /* 调整粽叶容器位置 */
+        .zongye-wrap {
+            position: absolute;
+            right: 10%;
+            top: 60%;
+            transform: translateY(-50%);
+            width: 120px;
+            height: 120px;
+        }
+
+        /* 修改包扎按钮样式 */
+        .wrap-btn {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+        }
+        
+        .wrap-btn:hover {
+            transform: translateX(-50%) !important;
+            background-color: #2e7d32 !important;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2) !important;
+        }
+
+        /* 包扎好的粽子样式调整 */
+        .wrapped-zongzi {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 120px;
+            height: 120px;
+            z-index: 10;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .wrapped-zongzi.show {
+            opacity: 1;
+        }
+
+        /* 添加手指引导样式 */
+        .finger-guide {
+            position: absolute;
+            left: 5%;
+            top: 55%;
+            width: 40%;
+            height: 40px;
+            z-index: 100;
+            animation: fingerMove 1s ease-in-out 1;
+            display: none;
+        }
+
+        .finger {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            z-index: 101;
+        }
+
+        /* 煮粽子页面样式 */
+        .cook-zongzi-page {
+            width: 100%;
+            max-width: 800px;
+            padding: 15px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+        }
+
+        /* 确保厨房背景与其他页面一致 */
+        .cook-zongzi-page .kitchen-background {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            margin: 15px auto;
+        }
+        
+        .wrapped-zongzi2 {
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            opacity: 1 !important;
+            transform: scale(0.8);
+        }
+
+        @keyframes fingerMove {
+            0%, 100% { 
+                transform: translateX(0) translateY(0);
+            }
+            50% { 
+                transform: translateX(100%) translateY(20px);
+            }
+        }
+
+        .toast-container {
+            position: fixed;
+            top: 15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 6px;
+            z-index: 99999;
+            display: none;
+            animation: fadeInOut 1s ease-in-out;
+            min-width: 150px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateX(-50%) translateY(-15px); }
+            20% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            80% { opacity: 1; transform: translateX(-50%) translateY(0); }
+            100% { opacity: 0; transform: translateX(-50%) translateY(-15px); }
+        }
+        
+        /* 划船游戏样式 */
+        .boat-game-page {
+            width: 100%;
+            max-width: 800px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .game-scene {
+            position: relative;
+            width: 100vw;
+            max-width: 360px;
+            aspect-ratio: 9/16;
+            height: auto;
+            margin: 0 auto;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #fff;
+        }
+        .game-scene .river-bg {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        .river-bg {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .obstacle {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            z-index: 5;
+        }
+
+        .boat-container {
+            position: absolute;
+            bottom: 15px;
+            left: 20px;
+            width: 80px;
+            transition: left 0.3s ease;
+            z-index: 10;
+        }
+
+        .boat {
+            width: 100%;
+            height: auto;
+        }
+        /* 调整物品大小 */
+        .item {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            z-index: 5;
+        }
+
+        .item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .game-instruction {
+            color: #2e7d32;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+
+        .game-over, .reward-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.9);
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            z-index: 100;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        .reward {
+            width: 80px;
+            height: 80px;
+            margin: 15px auto;
+        }
+
+        /* 分数显示样式 */
+        .score-display {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(255,255,255,0.7);
+            padding: 3px 8px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+        
+        .drip{
+            position:absolute;
+            top:80%;
+            left:20%;
+            display: block;
+            width:80px;
+            height:15px;
+            border-radius: 50%;
+            transform: translate(-50%,1500%);
+            animation: drip 2s infinite ease-in;
+            animation-delay: var(--delay);
+        }
+        
+        .drip:nth-child(1) { left: 10%; --delay: 0s; }
+        .drip:nth-child(2) { left: 30%; --delay: 0.5s; }
+        .drip:nth-child(3) { left: 50%; --delay: 1s; }
+        .drip:nth-child(4) { left: 70%; --delay: 1.5s; }
+        .drip:nth-child(5) { left: 90%; --delay: 2s; }
+        .drip:nth-child(6) { left: 15%; --delay: 0.25s; }
+        .drip:nth-child(7) { left: 25%; --delay: 0.75s; }
+        .drip:nth-child(8) { left: 45%; --delay: 1.25s; }
+        .drip:nth-child(9) { left: 65%; --delay: 1.75s; }
+        .drip:nth-child(10) { left: 85%; --delay: 2.25s; }
+        
+        .drip:before,
+        .drip:after{
+            content:'';
+            position:absolute;
+            top:85%;
+            left:20%;
+            background: skyblue;
+            border-radius: 50%;
+            opacity: 0.5;
+            transform: translate(-50%,50%) scale(1);
+            animation: ripple 3s infinite ease-in;
+        }
+        
+        .drip:after{
+            width:20px;
+            height:20px;
+            border-radius: 0 50% 50%;
+            transform: translate(-50%,1500%) rotate(45deg);
+            animation: drip 2s infinite ease-in;
+            animation-delay: var(--delay);
+        }
+
+        @keyframes drip{
+            0%{
+                transform: translate(-50%,-1000%) rotate(45deg);
+                opacity: 0; 
+            }
+            50%{
+                transform: translate(-50%,-1000%) rotate(45deg);
+                opacity: 1;
+            }
+            100%{
+                transform: translate(-50%,0) rotate(45deg);
+            }
+        }
+        /* 倒计时时钟样式 */
+        .countdown-clock {
+            position: absolute;
+            top: 20%;
+            left: 50%;
+            width: 80px;
+            height: 80px;
+            transform: translate(-50%, -50%);
+            z-index: 50;
+            display: none;
+        }
+
+        .clock-face {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background-color: #fff;
+            border: 3px solid #2e7d32;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            position: relative;
+        }
+
+        .clock-hand {
+            position: absolute;
+            left: 50%;
+            bottom: 50%;
+            transform-origin: 50% 100%;
+            background-color: #2e7d32;
+        }
+
+        .hour-hand {
+            width: 3px;
+            height: 18px;
+            margin-left: -1.5px;
+        }
+
+        .minute-hand {
+            width: 3px;
+            height: 35px;
+            margin-left: -1.5px;
+            background-color: #e53935;
+        }
+
+        .clock-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #2e7d32;
+            transform: translate(-50%, -50%);
+        }
+
+        .countdown-text {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2e7d32;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }  
+        
+        /* 新增烟雾动效样式 */
+        .smoke {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 50%;
+            filter: blur(5px);
+            opacity: 0;
+            z-index: 5;
+        }
+
+        @keyframes smokeRise {
+            0% {
+                transform: translateY(0) scale(0.5);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.7;
+            }
+            100% {
+                transform: translateY(-100px) scale(1.5);
+                opacity: 0;
+            }
+        }
+        
+        .smoke-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        /* 添加屈原页面样式 */
+        .quyuan-bg-container {
+    aspect-ratio: 720/1280;
+    width: 100vw;
+    max-width: 720px;
+    min-width: 200px;
+    height: auto;
+    margin: 8px auto 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: url('./河道2.png') center center / contain no-repeat;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    position: relative;
+    z-index: 1;
+    padding: 0;
+}
+
+/* 调整屈原容器和图片大小 */
+.quyuan-container {
+    width: 90%;  /* 增加宽度占比 */
+    height: 70%;  /* 增加高度占比 */
+}
+
+.quyuan-container img {
+    max-height: 80%;  /* 图片高度不变 */
+    max-width: 60%;  /* 图片宽度缩小 */
+}
+
+        /* 媒体查询 - 针对小屏幕设备 */
+        @media (max-width: 480px) {
+            .page-container {
+                padding: 15px;
+                width: 95%;
+            }
+            
+            .page-title, .origin-title, .make-title {
+                font-size: 1.2rem;
+                margin-bottom: 15px;
+            }
+            
+            .btn {
+                padding: 10px 20px;
+                font-size: 0.9rem;
+                min-width: 100px;
+            }
+            
+            .kitchen-background {
+                height: 250px;
+            }
+            
+            .pot-area {
+                width: 80px;
+                height: 80px;
+            }
+            
+            .zongye-origin {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .pot-cover {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .take-out-btn, .next-step-btn {
+                font-size: 0.8rem;
+                padding: 8px 15px;
+                bottom: 10px;
+            }
+            
+            .zongzi-container, .zongzi-container-2 {
+                width: 60px;
+                height: 60px;
+                bottom:10px;
+            }
+            
+            .zongzi-container img, .zongzi-container-2 img {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .selected-ingredients .ingredient {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .zongye-wrap {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .game-scene {
+                height: 250px;
+            }
+            
+            .boat-container {
+                width: 70px;
+            }
+            
+            .obstacle, .item {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .game-instruction {
+                font-size: 0.8rem;
+            }
+            
+            /* 起源页响应式调整 */
+            .origin-card-container {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(4, 1fr);
+                height: 90%;
+                max-width: 300px;
+            }
+            
+            .origin-kitchen-container {
+                height: 600px;
+            }
+            
+            .origin-card-back {
+                font-size: 0.8rem;
+                padding: 10px;
+            }
+        }
+        
+        /* 媒体查询 - 针对平板设备 */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .kitchen-background {
+                height: 350px;
+            }
+            
+            .game-scene {
+                height: 350px;
+            }
+        }
+
+        .quyuan-bg-container {
+            aspect-ratio: 9/16;
+            width: 98vw;
+            max-width: 420px;
+            min-width: 200px;
+            min-height: 480vh;
+            margin: 10px auto 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: url('./素材/河道2.png') center center / contain no-repeat;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            position: relative;
+            z-index: 1;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        #duihuakuang1 {
+            width: 120px !important;
+            height: auto !important;
+        }
+
+        #quyuanNextImg {
+            max-width: 100% !important;
+            max-height: 100% !important;
+        }
+        #duihuakuang1, #duihuakuang2 {
+            width: 160px !important;
+            height: auto !important;
+        }
+
+        /* 祈福页面主体 */
+        .wish-main-row {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 40px;
+          background: rgba(255,255,255,0.85);
+          border-radius: 24px;
+          box-shadow: 0 8px 32px rgba(44,62,80,0.12);
+          padding: 32px 24px;
+          margin: 0 auto 30px auto;
+          max-width: 600px;
+        }
+
+        .wish-paper {
+          width: 200px;
+          min-width: 120px;
+          max-width: 40vw;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .wish-paper img {
+          width: 100%;
+          border-radius: 12px;
+          box-shadow: 0 4px 16px rgba(44,62,80,0.13);
+          transition: opacity 0.4s;
+          background: #fff;
+        }
+
+        .wish-btn-col {
+          display: flex;
+          flex-direction: column;
+          gap: 18px;
+          align-items: stretch;
+        }
+
+        .wish-btn {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          font-size: 1.1rem;
+          padding: 14px 32px;
+          border: none;
+          border-radius: 28px;
+          background: linear-gradient(90deg, #e0f7fa 0%, #fffde7 100%);
+          color: #2e7d32;
+          box-shadow: 0 2px 8px rgba(44,62,80,0.08);
+          cursor: pointer;
+          font-family: inherit;
+          font-weight: bold;
+          transition: background 0.2s, transform 0.15s, color 0.2s, box-shadow 0.2s;
+          outline: none;
+          margin: 0;
+          position: relative;
+          overflow: hidden;
+        }
+
+        .wish-btn span {
+          font-size: 1.3em;
+        }
+
+        .wish-btn:hover, .wish-btn:focus {
+          background: linear-gradient(90deg, #a5d6a7 0%, #fffde7 100%);
+          color: #1b5e20;
+          transform: scale(1.06);
+          box-shadow: 0 4px 16px rgba(44,62,80,0.18);
+        }
+
+        .wish-btn:active {
+          transform: scale(0.97);
+          background: linear-gradient(90deg, #b2dfdb 0%, #fffde7 100%);
+        }
+
+        @media (max-width: 600px) {
+          .wish-main-row {
+            flex-direction: column;
+            gap: 24px;
+            padding: 18px 6px;
+            max-width: 98vw;
+          }
+          .wish-paper {
+            width: 60vw;
+            max-width: 90vw;
+          }
+          .wish-btn {
+            font-size: 1rem;
+            padding: 12px 0;
+          }
+        }
+        @keyframes fadeInDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+    </style>
+</head>
+<body>
+    <!-- 在body标签内的最前面添加音乐元素 -->
+
+
+    <!-- 水滴效果 -->
+    <div class="drip" style="left:10%; top:10%;"></div>
+    <div class="drip" style="left:30%; top:20%;"></div>
+    <div class="drip" style="left:50%; top:70%;"></div>
+    <div class="drip" style="left:70%; top:25%;"></div>
+    <div class="drip" style="left:90%; top:15%;"></div>
+    <div class="drip" style="left:15%; top:5%;"></div>
+    <div class="drip" style="left:25%; top:1%;"></div>
+    <div class="drip" style="left:45%; top:15%;"></div>
+    <div class="drip" style="left:65%; top:10%;"></div>
+    <div class="drip" style="left:85%; top:5%;"></div>
+    
+    <!-- 加载页面 -->
+    <div class="page-container" id="loadingPage">
+        <h1 class="page-title">端午佳节，美味加载中...</h1>
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar" id="progressBar">
+                <div class="percentage" id="percentage">0%</div>
+            </div>
+        </div>
+        <p class="loading-text" id="loadingText">准备粽子中...</p>
+        <p class="complete-message" id="completeMessage">粽子已备好，端午安康！</p>
+        <button class="btn" id="enterBtn">进入游戏</button>
+    </div>
+
+    <audio id="bgm" src="./素材/bgm.mp3" loop preload="auto"></audio>
+    <img id="musicToggle" src="./素材/music-off.png" alt="音乐开关" style="position:fixed;top:50px;right:20px;z-index:9999;width:40px;height:40px;cursor:pointer;">
+    <!-- 端午来源页面 -->
+    <div class="page-container" id="originPage">
+        <h1 class="page-title">端午节的起源与传说</h1>
+        <p class="view-hint">点击图片查看详情</p>
+        
+        <!-- 厨房背景容器 -->
+        <div class="origin-kitchen-container">
+            <img src="./素材/厨房场景.jpg" alt="厨房背景" class="origin-kitchen-bg">
+            
+            <!-- 四个可点击的卡片 -->
+            <div class="origin-card-container">
+                <div class="origin-card" data-index="1">
+                    <div class="origin-card-front">
+                        <img src="./素材/端午起源1.jpg" alt="端午来源漫画1">
+                    </div>
+                    <div class="origin-card-back">
+                        <p>战国时期，楚国诗人屈原因忧愤国事，于五月初五投汨罗江自尽。他的高洁品格与爱国精神深受百姓敬仰，这一悲壮之举成为端午节的重要起源。</p>
+                    </div>
+                </div>
+                
+                <div class="origin-card" data-index="2">
+                    <div class="origin-card-front">
+                        <img src="./素材/端午起源2.jpg" alt="端午来源漫画2">
+                    </div>
+                    <div class="origin-card-back">
+                        <p>沿岸百姓得知屈原投江，纷纷赶到江边哀悼。他们悲痛不已，自发组织起来，希望能寻回诗人的遗体，表达对他的深切怀念。</p>
+                    </div>
+                </div>
+                
+                <div class="origin-card" data-index="3">
+                    <div class="origin-card-front">
+                        <img src="./素材/端午起源3.jpg" alt="端午来源漫画3">
+                    </div>
+                    <div class="origin-card-back">
+                        <p>众人划着船只，在江面四处搜寻。激烈的鼓声与船桨激起的水花，形成了最早的"竞渡"场景，后来演变为端午赛龙舟的习俗。</p>
+                    </div>
+                </div>
+                
+                <div class="origin-card" data-index="4">
+                    <div class="origin-card-front">
+                        <img src="./素材/端午起源4.jpg" alt="端午来源漫画4">
+                    </div>
+                    <div class="origin-card-back">
+                        <p>为保护屈原遗体不被鱼虾啃食，人们将米团包裹在竹叶中投入江中。这一善举逐渐发展为端午节吃粽子的传统，寄托了人们对屈原的哀思。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <button class="btn" id="makeZongziBtn">制作粽子，纪念屈原</button>
+    </div>
+
+    <!-- 制作粽子页面 -->
+    <div class="make-zongzi-page page-container" id="makeZongziPage">
+        <h1 class="make-title">制作粽子，纪念屈原</h1>
+        <!-- 添加提示框 -->
+        <div class="hint-container">
+            <div class="hint-trigger">点击查看提示</div>
+            <div class="hint-content">第一步：把干粽叶放入锅中煮韧</div>
+        </div>
+        
+        <!-- 添加厨房背景图 -->
+        <div class="kitchen-background">
+            <img src="./素材/厨房场景.jpg" alt="厨房场景">
+            
+            <!-- 锅的位置 -->
+            <div class="pot-area" id="potArea"></div>
+            
+            <!-- 粽叶初始位置 -->
+            <div class="zongye-origin" id="zongyeOrigin">
+                <img src="./素材/粽叶.png" alt="粽叶" class="zongye" draggable="true">
+            </div>
+            
+            <!-- 锅盖（初始隐藏） -->
+            <div class="pot-cover" id="potCover">
+                <img src="./素材/锅盖.png" alt="锅盖">
+            </div>
+
+            
+            <!-- 添加时钟元素 -->
+            <div class="countdown-clock" id="countdownClock">
+                <div class="clock-face">
+                    <div class="clock-hand hour-hand"></div>
+                    <div class="clock-hand minute-hand"></div>
+                    <div class="clock-center"></div>
+                </div>
+               
+            </div>
+            <!-- 提示信息 -->
+            <div class="timer-message" id="timerMessage">3分钟已到！</div>
+            <button class="btn take-out-btn" id="takeOutBtn">取出粽叶</button>
+            <button class="btn next-step-btn" id="nextStepBtn">下一步</button>
+        </div>
+    </div>
+
+    <!-- 制作粽子第二步页面 -->
+    <div class="make-step2-page page-container" id="makeStep2Page">
+        <h1 class="make-title">制作粽子 - 第二步</h1>
+        
+        <!-- 厨房背景 -->
+        <div class="kitchen-background">
+            <img src="./素材/厨房背景2.jpg" alt="厨房场景">
+            
+            <!-- 馅料位置 -->
+            <div class="ingredient-area">
+                <img src="./素材/豆沙馅.png" alt="豆沙馅" class="ingredient" data-type="豆沙馅">
+                <img src="./素材/花生馅.png" alt="花生馅" class="ingredient" data-type="花生馅">
+                <img src="./素材/咸蛋黄馅.png" alt="蛋黄馅" class="ingredient" data-type="蛋黄馅">
+                <img src="./素材/红枣馅.png" alt="红枣馅" class="ingredient" data-type="红枣馅">
+                <img src="./素材/糯米.png" alt="糯米" class="ingredient" data-type="糯米">
+            </div>
+            
+            <!-- 粽子容器 - 用于显示馅料 -->
+            <div class="zongzi-container" id="zongziContainer">
+                <!-- 这里会动态添加馅料 -->
+            </div>
+
+            <!-- 第二个粽子容器 - 用于显示糯米 -->
+            <div class="zongzi-container-2" id="zongziContainer2">
+                <!-- 这里会动态添加糯米 -->
+            </div>
+            
+            <!-- 下一步按钮 -->
+            <button class="btn next-step-btn" id="nextStep2Btn" style="display:none;">下一步</button>
+        </div>
+    </div>
+
+    <!-- 包扎粽子页面 -->
+    <div class="wrap-zongzi-page page-container" id="wrapZongziPage">
+        <h1 class="make-title">包扎粽子</h1>
+        
+        <!-- 厨房背景 -->
+        <div class="kitchen-background">
+            <img src="./素材/厨房背景2.jpg" alt="厨房场景">
+            
+            <!-- 添加手指和虚线元素 -->
+            <div class="finger-guide">
+                <img src="./素材/手.png" alt="手指" class="finger">
+                <div class="dotted-line"></div>
+            </div>
+            
+            <!-- 左侧：已选材料 -->
+            <div class="selected-ingredients">
+                <!-- 这里会动态显示从上个页面选择的材料 -->
+            </div>
+            
+            <!-- 右侧：初始粽叶 -->
+            <div class="zongye-wrap" id="zongyeWrap">
+                <img src="./素材/原始粽叶.png" alt="粽叶" class="zongye" draggable="false">
+            </div>
+            
+            <!-- 包扎按钮 -->
+            <button class="btn wrap-btn" id="wrapBtn">包扎粽子</button>
+            <button class="btn next-step-btn" id="nextStep3Btn" style="display:none;">下一步</button>
+        </div>
+    </div>
+
+    <!-- 煮粽子页面 -->
+    <div class="cook-zongzi-page page-container" id="cookZongziPage">
+        <h1 class="make-title">第四步：煮粽子</h1>
+        <div class="kitchen-background">
+            <img src="./素材/厨房场景.jpg" alt="厨房场景">
+
+            <!-- 新增烟雾容器 -->
+            <div class="smoke-container" id="smokeContainer"></div>
+            
+            <!-- 左侧：包扎好的粽子 - 位置与包扎页面一致 -->
+            <div class="zongye-wrap" id="wrappedZongziContainer">
+                <img src="./素材/煮好的粽子.png" alt="煮好的粽子" class="wrapped-zongzi2" draggable="true">
+            </div>
+            
+            <!-- 锅的位置 -->
+            <div class="pot-area" id="finalPotArea"></div>
+            
+            <!-- 锅盖（初始隐藏） -->
+            <div class="pot-cover" id="finalPotCover">
+                <img src="./素材/锅盖.png" alt="锅盖">
+            </div>
+            
+            <div class="countdown-clock" id="finalCountdownClock">
+                <div class="clock-face">
+                    <div class="clock-hand hour-hand"></div>
+                    <div class="clock-hand minute-hand"></div>
+                    <div class="clock-center"></div>
+                </div>
+            </div>
+            <!-- 提示信息 -->
+            <div class="timer-message" id="finalTimerMessage"></div>
+            <button class="btn take-out-btn" id="finalTakeOutBtn" style="display:none;">取出粽子</button>
+        </div>
+    </div>
+
+    <!-- 划船游戏页面 -->
+    <div class="boat-game-page page-container" id="boatGamePage">
+        <h1 class="make-title">划龙舟比赛</h1>
+        <!-- 游戏说明弹窗 -->
+        <div class="game-controls">
+            <p class="game-instruction">控制小船左右移动，艾草+1分，鱼-1分</p>
+            <button class="btn start-btn" id="startBtn">我明白了</button>
+        </div>
+
+        <!-- 游戏说明弹窗 -->
+        <div class="game-instruction-modal" id="gameInstructionModal" style="display:none;">
+            <div class="instruction-content">
+                <button class="btn" id="startGameBtn">重新开始</button>
+            </div>
+        </div>
+
+        <!-- 分数显示 -->
+        <div class="score-display">
+            艾草: <span id="score">0</span>/10
+        </div>
+        
+        <!-- 游戏场景 -->
+        <div class="game-scene">
+            <img src="./素材/河道背景.png" alt="河流背景" class="river-bg">
+            
+            <!-- 障碍物 -->
+            <div class="obstacle fish" style="left: 30%; top: 20%">
+                <img src="./素材/鱼.png" alt="鱼">
+            </div>
+            <div class="obstacle fish" style="left: 60%; top: 40%">
+                <img src="./素材/鱼.png" alt="鱼">
+            </div>
+            
+            <!-- 龙舟 -->
+            <div class="boat-container" id="boatContainer">
+                <img src="./素材/木船.png" alt="龙舟" class="boat">
+            </div>
+        
+            <!-- 游戏结束弹窗 -->
+            <div class="game-over" id="gameOver" style="display:none;">
+                <h2>游戏结束</h2>
+                <p id="gameResult"></p>
+                <button class="btn retry-btn" id="retryBtn">再试一次</button>
+            </div>
+            
+
+        </div>
+    </div>
+   
+    <div class="page-container" id="quyuanPage" style="display:none;">
+        <div class="quyuan-bg-container">
+            <h1 class="page-title">送给屈原</h1>
+            <div class="quyuan-container">
+                <img src="./素材/屈原1.png" alt="屈原">
+            </div>
+            <button class="btn" id="backBtn">返回</button>
+        </div>
+    </div>
+    <!-- 新的屈原下一页 -->
+    <div class="page-container quyuan-next-page" id="quyuanNextPage" style="display:none; width:100vw; max-width:720px; margin:0 auto; min-height:100vh; background:url('./素材/河道2.png') center center / cover no-repeat; position:relative; border-radius:16px; overflow:hidden;">
+        <img id="quyuanNextImg" src="./素材/屈原1.png" alt="屈原" style="position:absolute; top:50%; left:100%; transform:translateY(-50%); max-width:100% !important; max-height:100% !important; transition: left 1s cubic-bezier(0.4,0,0.2,1);">
+        <img id="duihuakuang1" src="./素材/对话框1.png" alt="对话框1" style="position:absolute; width:160px; height:auto; opacity:0; transition:opacity 0.8s; pointer-events:none;">
+        <img id="duihuakuang2" src="./素材/对话框2.png" alt="对话框2" style="position:absolute; width:160px; height:auto; opacity:0; transition:opacity 0.8s; pointer-events:none;">
+        <!-- 祈福按钮将由JS动态插入 -->
+    </div>
+    <!-- 祈福页面 -->
+    <div class="page-container" id="wishPage" style="display:none; width:100vw; max-width:720px; margin:0 auto; min-height:100vh; background:url('./祈福页背景.jpg') center center / cover no-repeat; position:relative; border-radius:16px; overflow:hidden;">
+        <h1 class="page-title" style="color:#fff; text-shadow:0 2px 8px #333;">端午祈福</h1>
+        <div style="display:flex;flex-direction:column;align-items:center;margin:0 0 30px 0;">
+            <!-- 书法纸图片 -->
+            <div id="wishPaper" style="width:220px;margin-bottom:20px;">
+                <img id="wishPaperImg" src="./素材/书法纸.png" style="width:100%;">
+            </div>
+            <div style="display:flex;flex-direction:column;align-items:center;">
+                <div style="margin-bottom:20px;">
+                    <button onclick="document.getElementById('wishPaperImg').src='./素材/事业.png'">事业</button>
+                    <button onclick="document.getElementById('wishPaperImg').src='./素材/健康.png'">健康</button>
+                    <button onclick="document.getElementById('wishPaperImg').src='./素材/财运.png'">财运</button>
+                    <button onclick="document.getElementById('wishPaperImg').src='./素材/爱情.png'">爱情</button>
+                    <button onclick="document.getElementById('wishPaperImg').src='./素材/学业.png'">学业</button>
+                </div>
+                <!-- 结束按钮 -->
+                <button class="btn wish-next-btn" id="endBtn" style="margin-top:20px;">结束</button>
+            </div>
+        </div>
+    </div>
+    <!-- 修改感谢页面结构 -->
+<div class="page-container" id="thanksPage" style="display:none; background:url('./素材/祈福页背景.jpg') center center / cover no-repeat;">
+    <div style="text-align:center;padding-top:100px;">
+        <h1 style="color:#7af99a;text-shadow:0 2px 4px rgba(0,0,0,0.5);margin-bottom:30px;opacity:0;animation:fadeInDown 1s 0.5s forwards;">感谢</h1>
+        <p style="color:#66e571;font-size:1.2em;text-shadow:0 1px 2px rgba(0,0,0,0.5);opacity:0;animation:fadeInDown 1s 1s forwards;">您的</p>
+        <p style="color:#72f08d;font-size:1.2em;text-shadow:0 1px 2px rgba(0,0,0,0.5);opacity:0;animation:fadeInDown 1s 1.5s forwards;">参与</p>
+    </div>
+</div>
+
+    <script>
+        // 页面元素
+        const loadingPage = document.getElementById('loadingPage');
+        const originPage = document.getElementById('originPage');
+        const makeZongziPage = document.getElementById('makeZongziPage');
+        const enterBtn = document.getElementById('enterBtn');
+        const makeZongziBtn = document.getElementById('makeZongziBtn');
+        const backToHomeBtn = document.getElementById('backToHomeBtn');
+
+        const hintTrigger = document.querySelector('.hint-trigger');
+        const hintContent = document.querySelector('.hint-content');
+
+        if (hintTrigger && hintContent) {
+            hintTrigger.addEventListener('click', function() {
+                hintTrigger.style.display = 'none';
+                hintContent.style.display = 'block';
+            });
+            
+            hintContent.addEventListener('click', function() {
+                hintTrigger.style.display = 'inline-block';
+                hintContent.style.display = 'none';
+            });
+        }
+        
+        // 初始显示加载页面
+        loadingPage.style.display = 'block';
+        
+        // 加载页面逻辑
+        let progress = 0;
+        const progressBar = document.getElementById('progressBar');
+        const percentage = document.getElementById('percentage');
+        const loadingText = document.getElementById('loadingText');
+        const completeMessage = document.getElementById('completeMessage');
+        
+        const loadingMessages = [
+            "准备粽子中...",
+            "清洗粽叶...",
+            "准备糯米...",
+            "加入馅料...",
+            "包裹成型...",
+            "上锅蒸煮...",
+            "即将完成..."
+        ];
+        
+        
+        // 进入游戏按钮点击事件
+        enterBtn.addEventListener('click', function() {
+            this.style.transform = 'scale(0.95)';
+            this.textContent = '加载中...';
+            this.disabled = true;
+            
+            // 开始加载进度条
+            const interval = setInterval(() => {
+                progress += Math.random() * 5;
+                if (progress > 100) progress = 100;
+                
+                progressBar.style.width = progress + '%';
+                percentage.textContent = Math.floor(progress) + '%';
+                
+                const messageIndex = Math.min(Math.floor(progress / (100 / (loadingMessages.length - 1))), loadingMessages.length - 1);
+                loadingText.textContent = loadingMessages[messageIndex];
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    loadingText.style.display = 'none';
+                    completeMessage.style.display = 'block';
+                    
+                    // 加载完成后跳转页面
+                    setTimeout(() => {
+                        loadingPage.style.display = 'none';
+                        showOriginPage();
+                    }, 800);
+                }
+            }, 300);
+        });
+        
+      
+        // 显示起源页
+        function showOriginPage() {
+            originPage.style.display = 'block';
+            
+            // 卡片动画
+            const cards = document.querySelectorAll('.origin-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 200);
+            });
+        }
+
+        // 图片翻转逻辑
+        document.querySelectorAll('.origin-card').forEach(card => {
+            card.addEventListener('click', function() {
+                this.classList.toggle('flipped');
+            });
+        });
+
+        // 制作粽子按钮点击事件
+        makeZongziBtn.addEventListener('click', function() {
+            this.style.transform = 'scale(0.95)';
+            this.textContent = '准备中...';
+            
+            setTimeout(() => {
+                originPage.style.display = 'none';
+                makeZongziPage.style.display = 'block';
+                
+                // 重置制作粽子页面的状态
+                document.getElementById('potCover').style.display = 'none';
+                document.getElementById('timerMessage').style.display = 'none';
+                document.getElementById('takeOutBtn').style.display = 'none';
+                document.getElementById('nextStepBtn').style.display = 'none';
+                document.querySelector('.zongye').style.position = 'absolute';
+            }, 800);
+        });
+        
+        // 制作粽子交互逻辑
+        const zongye = document.querySelector('.zongye');
+        const potArea = document.getElementById('potArea');
+        const potCover = document.getElementById('potCover');
+        const timerMessage = document.getElementById('timerMessage');
+        const takeOutBtn = document.getElementById('takeOutBtn');
+        const nextStepBtn = document.getElementById('nextStepBtn');
+
+        // 为移动端添加触摸事件
+        zongye.addEventListener('touchstart', handleTouchStart, { passive: false });
+        zongye.addEventListener('touchmove', handleTouchMove, { passive: false });
+        zongye.addEventListener('touchend', handleTouchEnd, false);
+        
+        let xDown = null;
+        let yDown = null;
+        let originalPosition = null;
+
+        function handleTouchStart(evt) {
+            originalPosition = {
+                left: zongye.offsetLeft,
+                top: zongye.offsetTop
+            };
+            
+            xDown = evt.touches[0].clientX;
+            yDown = evt.touches[0].clientY;
+            
+            // 为拖动添加视觉反馈
+            zongye.style.transform = 'scale(1.1)';
+            zongye.style.transition = 'transform 0.2s';
+        }
+
+        function handleTouchMove(evt) {
+            if (!xDown || !yDown) {
+                return;
+            }
+
+            let xUp = evt.touches[0].clientX;
+            let yUp = evt.touches[0].clientY;
+
+            let xDiff = xDown - xUp;
+            let yDiff = yDown - yUp;
+
+            zongye.style.position = 'absolute';
+            zongye.style.left = (originalPosition.left - xDiff) + 'px';
+            zongye.style.top = (originalPosition.top - yDiff) + 'px';
+        }
+
+        function handleTouchEnd() {
+            zongye.style.transform = 'scale(1)';
+            
+            // 检查是否放入锅中
+            const potRect = potArea.getBoundingClientRect();
+            const zongyeRect = zongye.getBoundingClientRect();
+            
+            if (
+                zongyeRect.right > potRect.left &&
+                zongyeRect.left < potRect.right &&
+                zongyeRect.bottom > potRect.top &&
+                zongyeRect.top < potRect.bottom
+            ) {
+                // 隐藏原位置的粽叶
+                document.getElementById('zongyeOrigin').style.display = 'none';
+                
+                // 显示锅盖
+                potCover.style.display = 'block';
+                
+                // 开始时钟动画
+                startClockAnimation();
+                
+                // 1秒后隐藏提示
+                setTimeout(() => {
+                    timerMessage.style.display = 'none';
+                }, 1000);
+                // 显示时钟
+                const clock = document.getElementById('countdownClock');
+                clock.style.display = 'block';
+                
+                // 3秒后显示"3分钟已到"提示
+                setTimeout(() => {
+                    timerMessage.textContent = "3分钟已到！";
+                    timerMessage.style.display = 'block';
+                    takeOutBtn.style.display = 'block';
+                    // 隐藏时钟
+                    clock.style.display = 'none';
+                }, 4000);
+            } else {
+                // 返回原位
+                zongye.style.left = originalPosition.left + 'px';
+                zongye.style.top = originalPosition.top + 'px';
+            }
+            
+            xDown = null;
+            yDown = null;
+        }
+        
+        // 新增时钟动画函数
+        function startClockAnimation() {
+            const clock = document.getElementById('countdownClock');
+            const minuteHand = clock.querySelector('.minute-hand');
+            
+            let rotations = 0;
+            const totalRotations = 3; // 总共转3圈
+            const duration = 3000; // 3秒内完成
+            const startTime = performance.now();
+            
+            // 更新时钟显示
+            function animateClock(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // 计算旋转角度（3圈=1080度）
+                const degrees = progress * 1080;
+                minuteHand.style.transform = `translateX(-50%) rotate(${degrees}deg)`;
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animateClock);
+                }
+            }
+            
+            requestAnimationFrame(animateClock);
+        }
+            
+        // 取出粽叶
+        takeOutBtn.addEventListener('click', function() {
+            potCover.style.display = 'none';
+            timerMessage.style.display = 'none';
+            this.style.display = 'none';
+            
+            // 显示原位置的粽叶
+            document.getElementById('zongyeOrigin').style.display = 'block';
+            
+            // 显示下一步按钮
+            nextStepBtn.style.display = 'block';
+        });
+
+        // 下一步按钮点击事件
+        nextStepBtn.addEventListener('click', function() {
+            makeZongziPage.style.display = 'none';
+            document.getElementById('makeStep2Page').style.display = 'block';
+        });
+        
+        // 制作粽子第二步交互逻辑
+        const nextStep2Btn = document.getElementById('nextStep2Btn');
+        const zongziContainer = document.getElementById('zongziContainer');
+        const zongziContainer2 = document.getElementById('zongziContainer2');
+        const ingredients = document.querySelectorAll('.ingredient');
+
+        ingredients.forEach(ingredient => {
+            ingredient.addEventListener('click', function() {
+                const type = this.dataset.type;
+                const imgSrc = this.src;
+                
+                if(type === '糯米') {
+                    // 清空并添加糯米到第二个容器
+                    zongziContainer2.innerHTML = '';
+                    const img = document.createElement('img');
+                    img.src = imgSrc;
+                    img.alt = type;
+                    zongziContainer2.appendChild(img);
+                } else {
+                    // 清空并添加馅料到第一个容器
+                    zongziContainer.innerHTML = '';
+                    const img = document.createElement('img');
+                    img.src = imgSrc;
+                    img.alt = type;
+                    zongziContainer.appendChild(img);
+                }
+                
+                // 检查是否完成
+                if(zongziContainer.children.length > 0 && zongziContainer2.children.length > 0) {
+                    nextStep2Btn.style.display = 'block';
+                }
+            });
+        });
+
+        // 下一步按钮点击事件
+        nextStep2Btn.addEventListener('click', function() {
+            document.getElementById('makeStep2Page').style.display = 'none';
+            document.getElementById('wrapZongziPage').style.display = 'block';
+
+            // 显示手指引导动画
+            const fingerGuide = document.querySelector('.finger-guide');
+            fingerGuide.style.display = 'block';
+            
+            // 6秒后隐藏手指
+            setTimeout(() => {
+                fingerGuide.style.display = 'none';
+            }, 1000);
+            
+            // 将选择的材料显示在包扎页面
+            const selectedIngredients = document.querySelector('.selected-ingredients');
+            selectedIngredients.innerHTML = '';
+            
+            // 添加糯米
+            const riceImg = zongziContainer2.querySelector('img');
+            if(riceImg) {
+                const rice = document.createElement('img');
+                rice.src = riceImg.src;
+                rice.alt = '糯米';
+                rice.className = 'ingredient';
+                rice.dataset.type = '糯米';
+                rice.draggable = true;
+                rice.style.position = 'absolute';
+                rice.style.left = '0';
+                rice.style.top = '0';
+                selectedIngredients.appendChild(rice);
+            }
+            
+            // 添加馅料
+            const fillingImg = zongziContainer.querySelector('img');
+            if(fillingImg) {
+                const filling = document.createElement('img');
+                filling.src = fillingImg.src;
+                filling.alt = fillingImg.alt;
+                filling.className = 'ingredient';
+                filling.dataset.type = fillingImg.alt;
+                filling.draggable = true;
+                selectedIngredients.appendChild(filling);
+            }
+        });
+        
+        // 包扎页面状态变量
+        let hasRice = false;
+        let hasFilling = false;
+        
+        // 为移动端添加触摸事件到材料
+        document.querySelector('.selected-ingredients').addEventListener('touchstart', function(e) {
+            if(e.target.classList.contains('ingredient')) {
+                handleIngredientTouchStart(e);
+            }
+        }, {passive: false});
+
+        document.querySelector('.selected-ingredients').addEventListener('touchmove', function(e) {
+            if(e.target.classList.contains('ingredient')) {
+                handleIngredientTouchMove(e);
+            }
+        }, {passive: false});
+
+        document.querySelector('.selected-ingredients').addEventListener('touchend', function(e) {
+            if(e.target.classList.contains('ingredient')) {
+                handleIngredientTouchEnd(e);
+            }
+        });
+        
+        let ingredientXDown = null;
+        let ingredientYDown = null;
+        let ingredientOriginalPosition = null;
+        let draggedIngredient = null;
+
+        function handleIngredientTouchStart(evt) {
+            evt.preventDefault();
+            draggedIngredient = evt.target;
+            ingredientOriginalPosition = {
+                left: draggedIngredient.offsetLeft,
+                top: draggedIngredient.offsetTop
+            };
+            
+            ingredientXDown = evt.touches[0].clientX;
+            ingredientYDown = evt.touches[0].clientY;
+            
+            // 为拖动添加视觉反馈
+            draggedIngredient.style.transform = 'scale(1.1)';
+            draggedIngredient.style.transition = 'transform 0.2s';
+            draggedIngredient.style.position = 'absolute';
+            draggedIngredient.style.zIndex = '100';
+        }
+
+        function handleIngredientTouchMove(evt) {
+            evt.preventDefault();
+            if (!ingredientXDown || !ingredientYDown || !draggedIngredient) {
+                return;
+            }
+
+            let xUp = evt.touches[0].clientX;
+            let yUp = evt.touches[0].clientY;
+
+            let xDiff = ingredientXDown - xUp;
+            let yDiff = ingredientYDown - yUp;
+
+            draggedIngredient.style.left = (ingredientOriginalPosition.left - xDiff) + 'px';
+            draggedIngredient.style.top = (ingredientOriginalPosition.top - yDiff) + 'px';
+        }
+
+        function handleIngredientTouchEnd(evt) {
+            evt.preventDefault();
+            if (!draggedIngredient) return;
+            
+            draggedIngredient.style.transform = 'scale(1)';
+            
+            // 检查是否放入粽叶中
+            const zongyeWrapRect = document.getElementById('zongyeWrap').getBoundingClientRect();
+            const ingredientRect = draggedIngredient.getBoundingClientRect();
+            
+            if (
+                ingredientRect.right > zongyeWrapRect.left &&
+                ingredientRect.left < zongyeWrapRect.right &&
+                ingredientRect.bottom > zongyeWrapRect.top &&
+                ingredientRect.top < zongyeWrapRect.bottom
+            ) {
+                const type = draggedIngredient.dataset.type;
+                
+                if(type === '糯米') {
+                    document.getElementById('zongyeWrap').innerHTML = '<img src="./素材/加了糯米的粽子.png" alt="装有糯米的粽叶" class="zongye">';
+                    hasRice = true;
+                    draggedIngredient.style.display = 'none';
+                } else {
+                    let zongziImg = '';
+                    switch(type) {
+                        case '豆沙馅': zongziImg = './素材/豆沙馅粽子.png'; break;
+                        case '花生馅': zongziImg = './素材/花生馅粽子.png'; break;
+                        case '蛋黄馅': zongziImg = './素材/咸蛋黄馅粽子.png'; break;
+                        case '红枣馅': zongziImg = './素材/红枣馅粽子.png'; break;
+                    }
+                    
+                    if(hasRice) {
+                        document.getElementById('zongyeWrap').innerHTML = `<img src="${zongziImg}" alt="装有${type}的粽叶" class="zongye">`;
+                        hasFilling = true;
+                        draggedIngredient.style.display = 'none';
+                    } else {
+                        // 显示提示
+                        showToast('请先放入糯米！');
+                        // 返回原位
+                        draggedIngredient.style.left = ingredientOriginalPosition.left + 'px';
+                        draggedIngredient.style.top = ingredientOriginalPosition.top + 'px';
+                    }
+                }
+            } else {
+                // 返回原位
+                draggedIngredient.style.left = ingredientOriginalPosition.left + 'px';
+                draggedIngredient.style.top = ingredientOriginalPosition.top + 'px';
+            }
+            
+            draggedIngredient.style.position = 'static';
+            draggedIngredient.style.zIndex = 'auto';
+            draggedIngredient = null;
+            ingredientXDown = null;
+            ingredientYDown = null;
+        }
+        
+        // 包扎按钮点击事件
+        document.getElementById('wrapBtn').addEventListener('click', function() {
+            if(!hasRice || !hasFilling) {
+                showToast('请先按顺序放入糯米和馅料！');
+                return;
+            }
+            
+            // 替换为包扎好的粽子
+            document.getElementById('zongyeWrap').innerHTML = '<img src="./素材/包扎好的粽子.png" alt="包扎好的粽子" class="zongye">';
+            
+            // 隐藏包扎按钮，显示下一步按钮
+            this.style.display = 'none';
+            document.getElementById('nextStep3Btn').style.display = 'block';
+        });
+        
+        // 下一步按钮点击事件
+        document.getElementById('nextStep3Btn').addEventListener('click', function() {
+            document.getElementById('wrapZongziPage').style.display = 'none';
+            document.getElementById('cookZongziPage').style.display = 'block';
+            
+            // 重置煮粽子页面状态
+            document.getElementById('finalPotCover').style.display = 'none';
+            document.getElementById('finalTimerMessage').style.display = 'none';
+            document.getElementById('finalTakeOutBtn').style.display = 'none';
+            document.querySelector('#wrappedZongziContainer img').style.position = 'absolute';
+        });
+            
+        // 煮粽子页面的交互逻辑
+        const wrappedZongzi = document.querySelector('#wrappedZongziContainer img');
+        const finalPotArea = document.getElementById('finalPotArea');
+        const finalPotCover = document.getElementById('finalPotCover');
+        const finalTimerMessage = document.getElementById('finalTimerMessage');
+        const finalTakeOutBtn = document.getElementById('finalTakeOutBtn');
+
+        // 为移动端添加触摸事件
+        wrappedZongzi.addEventListener('touchstart', handleWrappedTouchStart, { passive: false });
+        wrappedZongzi.addEventListener('touchmove', handleWrappedTouchMove, { passive: false });
+        wrappedZongzi.addEventListener('touchend', handleWrappedTouchEnd, false);
+        
+        let wrappedXDown = null;
+        let wrappedYDown = null;
+        let wrappedOriginalPosition = null;
+
+        function handleWrappedTouchStart(evt) {
+            wrappedOriginalPosition = {
+                left: wrappedZongzi.offsetLeft,
+                top: wrappedZongzi.offsetTop
+            };
+            
+            wrappedXDown = evt.touches[0].clientX;
+            wrappedYDown = evt.touches[0].clientY;
+            
+            // 为拖动添加视觉反馈
+            wrappedZongzi.style.transform = 'scale(1.1)';
+            wrappedZongzi.style.transition = 'transform 0.2s';
+        }
+
+        function handleWrappedTouchMove(evt) {
+            if (!wrappedXDown || !wrappedYDown) {
+                return;
+            }
+
+            let xUp = evt.touches[0].clientX;
+            let yUp = evt.touches[0].clientY;
+
+            let xDiff = wrappedXDown - xUp;
+            let yDiff = wrappedYDown - yUp;
+
+            wrappedZongzi.style.position = 'absolute';
+            wrappedZongzi.style.left = (wrappedOriginalPosition.left - xDiff) + 'px';
+            wrappedZongzi.style.top = (wrappedOriginalPosition.top - yDiff) + 'px';
+        }
+
+        let smokeInterval; // 烟雾效果间隔
+
+        function handleWrappedTouchEnd() {
+            wrappedZongzi.style.transform = 'scale(1)';
+            
+            // 检查是否放入锅中
+            const potRect = finalPotArea.getBoundingClientRect();
+            const zongziRect = wrappedZongzi.getBoundingClientRect();
+            
+            if (
+                zongziRect.right > potRect.left &&
+                zongziRect.left < potRect.right &&
+                zongziRect.bottom > potRect.top &&
+                zongziRect.top < potRect.bottom
+            ) {
+                // 隐藏原位置的粽子
+                document.getElementById('wrappedZongziContainer').style.display = 'none';
+                
+                // 显示锅盖
+                finalPotCover.style.display = 'block';
+
+                // 显示时钟
+                const finalClock = document.getElementById('finalCountdownClock');
+                finalClock.style.display = 'block';
+
+                // 开始时钟动画
+                let rotations = 0;
+                const totalRotations = 4; // 总共转4圈
+                const duration = 4000; // 4秒内完成
+                const startTime = performance.now();
+                const minuteHand = finalClock.querySelector('.minute-hand');
+
+                function animateFinalClock(currentTime) {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    // 计算旋转角度（4圈=1440度）
+                    const degrees = progress * 1440;
+                    minuteHand.style.transform = `translateX(-50%) rotate(${degrees}deg)`;
+                    
+                    if (progress < 1) {
+                        requestAnimationFrame(animateFinalClock);
+                    } else {
+                        finalClock.style.display = 'none';
+                    }
+                }
+
+                requestAnimationFrame(animateFinalClock);
+                
+                // 开始烟雾效果
+                const smokeContainer = document.getElementById('smokeContainer');
+                smokeInterval = setInterval(() => {
+                    const smoke = document.createElement('div');
+                    smoke.className = 'smoke';
+                    
+                    // 设置烟雾初始位置（锅盖上方）
+                    const potCoverRect = finalPotCover.getBoundingClientRect();
+                    const containerRect = document.querySelector('.kitchen-background').getBoundingClientRect();
+                    
+                    const left = potCoverRect.left - containerRect.left + potCoverRect.width/2 - 30;
+                    const top = potCoverRect.top - containerRect.top - 180;  // 上移80px
+                    
+                    smoke.style.left = left + 'px';
+                    smoke.style.top = top + 'px';
+                    smoke.style.animation = 'smokeRise 3s ease-out forwards';
+                    
+                    smokeContainer.appendChild(smoke);
+                    
+                    // 动画结束后移除元素
+                    setTimeout(() => {
+                        smoke.remove();
+                    }, 3000);
+                }, 800); // 每0.8秒生成一团烟雾
+                // 2秒后显示"两小时已到"提示
+                setTimeout(() => {
+                    finalTimerMessage.textContent = "两小时已到！";
+                    finalTimerMessage.style.display = 'block';
+                    finalTakeOutBtn.style.display = 'block';
+                }, 4000);
+            } else {
+                // 返回原位
+                wrappedZongzi.style.left = wrappedOriginalPosition.left + 'px';
+                wrappedZongzi.style.top = wrappedOriginalPosition.top + 'px';
+            }
+            
+            wrappedXDown = null;
+            wrappedYDown = null;
+        }
+        
+        // 取出粽子按钮事件
+        finalTakeOutBtn.addEventListener('click', function() {
+            finalPotCover.style.display = 'none';
+            finalTimerMessage.style.display = 'none';
+            this.style.display = 'none';
+            
+            // 显示原位置的粽子
+            document.getElementById('wrappedZongziContainer').style.display = 'block';
+            
+            // 添加送出粽子按钮
+            const sendBtn = document.createElement('button');
+            sendBtn.className = 'btn send-btn';
+            sendBtn.textContent = '送出粽子';
+            sendBtn.style.position = 'absolute';
+            sendBtn.style.bottom = '20px';
+            sendBtn.style.left = '50%';
+            sendBtn.style.transform = 'translateX(-50%)';
+            sendBtn.style.zIndex = '9999';
+            document.querySelector('.cook-zongzi-page .kitchen-background').appendChild(sendBtn);
+            
+            sendBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                document.getElementById('cookZongziPage').style.display = 'none';
+                document.getElementById('boatGamePage').style.display = 'block';
+                this.remove();
+            });
+        });
+        
+        // 划船游戏逻辑
+        const boatGamePage = document.getElementById('boatGamePage');
+        const boatContainer = document.getElementById('boatContainer');
+        const startBtn = document.getElementById('startBtn');
+        const gameOver = document.getElementById('gameOver');
+        const gameResult = document.getElementById('gameResult');
+        const rewardContainer = document.getElementById('rewardContainer');
+        const retryBtn = document.getElementById('retryBtn');
+        const backHomeBtn = document.getElementById('backHomeBtn');
+        const scoreDisplay = document.getElementById('score');
+
+        // 游戏变量
+        let score = 0;
+        let gameActive = false;
+        let boatPosition = 50;
+        const items = [];
+        
+        // 显示游戏说明弹窗
+        const gameInstructionModal = document.getElementById('gameInstructionModal');
+        const startGameBtn = document.getElementById('startGameBtn');
+        
+        // 开始游戏按钮点击事件
+        startBtn.addEventListener('click', function() {
+            this.style.display = 'none';
+            document.querySelector('.game-instruction').style.display = 'none';
+            startGame();
+        });
+        
+        // 开始游戏按钮(弹窗中的)
+        startGameBtn.addEventListener('click', function() {
+            gameInstructionModal.style.display = 'none';
+            startGame();
+        });
+        
+        function startGame() {
+            gameActive = true;
+            score = 0;
+            scoreDisplay.textContent = score;
+            
+            // 清空之前的所有物品
+            items.forEach(item => item.element.remove());
+            items.length = 0;
+            
+            // 设置木船初始位置在中间(50%)
+            boatPosition = 50;
+            boatContainer.style.left = '50%';
+            
+            // 游戏循环
+            let lastTime = 0;
+            let lastItemTime = 0;
+            
+            function gameLoop(timestamp) {
+                if (!gameActive) return;
+                
+                if (timestamp - lastTime > 16) { // 约60fps
+                    lastTime = timestamp;
+                    
+                    // 更新物品位置
+                    items.forEach(item => {
+                        item.y += item.speed;
+                        item.element.style.top = `${item.y}px`;
+                        
+                        // 检查是否超出屏幕
+                        if (item.y > 300) {
+                            item.element.remove();
+                            const index = items.indexOf(item);
+                            if(index > -1) items.splice(index, 1);
+                        }
+                        
+                        // 检查碰撞
+                        checkCollision(item);
+                    });
+                    
+                    // 添加物品
+                    if (timestamp - lastItemTime > 1000) { // 每1秒生成一个物品
+                        lastItemTime = timestamp;
+                        
+                        // 70%概率生成艾草，30%概率生成鱼
+                        const isAiCao = Math.random() < 0.7;
+                        const imgSrc = isAiCao ? './素材/艾草.png' : './素材/鱼.png';
+                        createItem(imgSrc, isAiCao);
+                    }
+                }
+                
+                requestAnimationFrame(gameLoop);
+            }
+            
+            // 开始游戏循环
+            gameLoop();
+        }
+        
+        // 创建掉落物品
+        function createItem(imgSrc, isAiCao) {
+            const item = document.createElement('div');
+            item.className = 'item';
+            item.innerHTML = `<img src="${imgSrc}" alt="${isAiCao ? '艾草' : '鱼'}">`;
+            document.querySelector('.game-scene').appendChild(item);
+            
+            // 掉落范围(40%-60%)
+            const x = Math.random() * 20 + 40; 
+            const y = -50;
+            
+            item.style.position = 'absolute';
+            item.style.left = `${x}%`;
+            item.style.top = `${y}px`;
+            
+            items.push({
+                element: item,
+                x,
+                y,
+                speed: Math.random() * 1 + 0.5,
+                isAiCao
+            });
+        }
+        
+        // 碰撞检测
+        function checkCollision(item) {
+            const boatRect = boatContainer.getBoundingClientRect();
+            const itemRect = item.element.getBoundingClientRect();
+            
+            const collisionBuffer = 15;
+            
+            if (
+                boatRect.right - collisionBuffer > itemRect.left + collisionBuffer &&
+                boatRect.left + collisionBuffer < itemRect.right - collisionBuffer &&
+                boatRect.bottom - collisionBuffer > itemRect.top + collisionBuffer &&
+                boatRect.top + collisionBuffer < itemRect.bottom - collisionBuffer
+            ) {
+                if (item.isAiCao) {
+                    // 收集艾草
+                    score++;
+                    scoreDisplay.textContent = score;
+                    item.element.remove();
+                    const index = items.indexOf(item);
+                    if(index > -1) items.splice(index, 1);
+                    
+                    if (score >= 10) {
+                        gameWin();
+                    }
+                } else {
+                    // 碰到障碍物扣分
+                    score = Math.max(0, score - 1);
+                    scoreDisplay.textContent = score;
+                    item.element.remove();
+                    const index = items.indexOf(item);
+                    if(index > -1) items.splice(index, 1);
+                }
+            }
+        }
+        
+        // 游戏胜利
+        function gameWin() {
+    gameActive = false;
+
+    // 移除已存在的送给屈原按钮
+    const oldBtn = document.querySelector('.send-btn');
+    if (oldBtn) oldBtn.remove();
+
+    // 创建送给屈原按钮
+    const sendBtn = document.createElement('button');
+    sendBtn.className = 'btn send-btn';
+    sendBtn.textContent = '送给屈原';
+    sendBtn.style.position = 'absolute';
+    sendBtn.style.bottom = '20px';
+    sendBtn.style.left = '50%';
+    sendBtn.style.transform = 'translateX(-50%)';
+    sendBtn.style.zIndex = '9999';
+    document.querySelector('.game-scene').appendChild(sendBtn);
+
+    // 事件绑定
+    sendBtn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        document.getElementById('boatGamePage').style.display = 'none';
+        document.getElementById('quyuanPage').style.display = 'none';
+        document.getElementById('quyuanNextPage').style.display = 'block';
+        setTimeout(function() {
+            var quyuanNextImg = document.getElementById('quyuanNextImg');
+            if (quyuanNextImg) {
+                quyuanNextImg.style.left = '50%';
+                quyuanNextImg.style.transform = 'translate(-50%, -50%)';
+                // 切换屈原图片为屈原2
+                quyuanNextImg.src = './素材/屈原2.png';
+            }
+            // 动画结束后再浮现对话框
+            setTimeout(function() {
+                var duihuakuang1 = document.getElementById('duihuakuang1');
+                var duihuakuang2 = document.getElementById('duihuakuang2');
+                if (duihuakuang1 && quyuanNextImg) {
+                    var rect = quyuanNextImg.getBoundingClientRect();
+                    var parentRect = quyuanNextImg.parentElement.getBoundingClientRect();
+                    duihuakuang1.style.left = (rect.right - parentRect.left - 160) + 'px';
+                    duihuakuang1.style.top = (rect.top - parentRect.top - 50) + 'px';
+                    duihuakuang1.style.opacity = '1';
+                    // 1.5秒后切换为对话框2
+                    setTimeout(function() {
+                        duihuakuang1.style.opacity = '0';
+                        if (duihuakuang2) {
+                            duihuakuang2.style.left = (rect.right - parentRect.left - 160) + 'px';
+                            duihuakuang2.style.top = (rect.top - parentRect.top - 50) + 'px';
+                            duihuakuang2.style.opacity = '1';
+                            // 动态插入祈福按钮
+                            let wishBtn = document.getElementById('wishBtn');
+                            if (!wishBtn) {
+                                wishBtn = document.createElement('button');
+                                wishBtn.id = 'wishBtn';
+                                wishBtn.className = 'btn';
+                                wishBtn.textContent = '祈福';
+                                wishBtn.style.position = 'fixed';
+                                wishBtn.style.left = '50%';
+                                wishBtn.style.bottom = '40px';
+                                wishBtn.style.transform = 'translateX(-50%)';
+                                wishBtn.style.zIndex = '99999';
+                                document.getElementById('quyuanNextPage').appendChild(wishBtn);
+                                wishBtn.addEventListener('click', function() {
+                                    document.getElementById('quyuanNextPage').style.display = 'none';
+                                    document.getElementById('wishPage').style.display = 'block';
+                                });
+                            }
+                        }
+                    }, 1500);
+                }
+            }, 1000); // 动画1s后再浮现
+        }, 50);
+        this.style.display = 'none';
+    });
+}
+
+// 返回按钮点击事件
+document.getElementById('backBtn').addEventListener('click', function() {
+    document.getElementById('quyuanPage').style.display = 'none';
+    document.getElementById('boatGamePage').style.display = 'block';
+});
+        
+        // 触摸控制划船
+        let touchStartX = 0;
+        
+        document.querySelector('.game-scene').addEventListener('touchstart', function(e) {
+            touchStartX = e.touches[0].clientX;
+        }, false);
+        
+        document.querySelector('.game-scene').addEventListener('touchmove', function(e) {
+            if (!gameActive) return;
+            
+            const touchX = e.touches[0].clientX;
+            const diff = touchX - touchStartX;
+            
+            if (diff > 10) { // 向右滑动
+                boatPosition = Math.min(70, boatPosition + 5);
+                boatContainer.style.left = boatPosition + '%';
+                touchStartX = touchX;
+            } else if (diff < -10) { // 向左滑动
+                boatPosition = Math.max(30, boatPosition - 5);
+                boatContainer.style.left = boatPosition + '%';
+                touchStartX = touchX;
+            }
+        }, false);
+        
+        // 显示提示信息
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast-container';
+            toast.innerHTML = `<div class="toast-content">${message}</div>`;
+            document.body.appendChild(toast);
+            
+            toast.style.display = 'block';
+            
+            setTimeout(() => {
+                toast.style.display = 'none';
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 1000);
+            }, 1000);
+        }
+
+        window.addEventListener('DOMContentLoaded', function() {
+    const bgm = document.getElementById('bgm');
+    const musicToggle = document.getElementById('musicToggle');
+    let isPlaying = false;
+
+    if (!bgm || !musicToggle) {
+        alert('找不到bgm或musicToggle元素！');
+        return;
+    }
+
+    // 初始为关闭图片
+    musicToggle.src = './素材/music-off.png';
+
+    function tryPlayBgm() {
+        if (!isPlaying) {
+            bgm.play().then(() => {
+                isPlaying = true;
+                musicToggle.src = './素材/music-on.png';
+            }).catch(() => {});
+        }
+        document.body.removeEventListener('touchstart', tryPlayBgm);
+        document.body.removeEventListener('click', tryPlayBgm);
+    }
+    document.body.addEventListener('touchstart', tryPlayBgm, { once: true });
+    document.body.addEventListener('click', tryPlayBgm, { once: true });
+
+    musicToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        if (bgm.paused) {
+            bgm.play();
+            isPlaying = true;
+            musicToggle.src = './素材/music-on.png';
+        } else {
+            bgm.pause();
+            isPlaying = false;
+            musicToggle.src = './素材/music-off.png';
+        }
+    });
+});
+// 创建祈福类别映射
+const wishCategoryMap = {
+    '事业': { img: './素材/事业.png' },
+    '健康': { img: './素材/健康.png' },
+    '财运': { img: './素材/财运.png' },
+    '爱情': { img: './素材/爱情.png' },
+    '学业': { img: './素材/学业.png' }
+};
+
+// 为所有祈福按钮添加点击事件
+document.querySelectorAll('.wish-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const type = this.textContent;
+        const wishPaperImg = document.getElementById('wishPaperImg');
+        if (wishPaperImg && wishCategoryMap[type]) {
+            wishPaperImg.src = wishCategoryMap[type].img;
+        }
+    });
+});
+// 在脚本部分添加
+document.getElementById('endBtn').addEventListener('click', function() {
+    document.getElementById('wishPage').style.display = 'none';
+    document.getElementById('thanksPage').style.display = 'block';
+});
+// 确保在DOM加载完成后绑定事件
+document.addEventListener('DOMContentLoaded', function() {
+    const endBtn = document.getElementById('endBtn');
+    if(endBtn) {
+        endBtn.addEventListener('click', function() {
+            document.getElementById('wishPage').style.display = 'none';
+            document.getElementById('thanksPage').style.display = 'block';
+        });
+    }
+});
+    </script>
+    
+    
+</body>
+</html>
