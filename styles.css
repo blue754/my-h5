@@ -1,0 +1,985 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    overflow: hidden;
+    position: relative;
+}
+
+/* 模糊色块背景 */
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.8;
+}
+
+.blob-1 {
+    width: 300px;
+    height: 300px;
+    background: #ff9a9e;
+    top: 20%;
+    left: 10%;
+    animation: float 8s ease-in-out infinite;
+}
+
+.blob-2 {
+    width: 400px;
+    height: 400px;
+    background: #a1c4fd;
+    bottom: 15%;
+    right: 10%;
+    animation: float 10s ease-in-out infinite reverse;
+}
+
+.blob-3 {
+    width: 250px;
+    height: 250px;
+    background: #fbc2eb;
+    top: 60%;
+    left: 30%;
+    animation: float 7s ease-in-out infinite 2s;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-20px) rotate(5deg);
+    }
+}
+
+/* 游戏主界面 */
+.game-container {
+    text-align: center;
+    z-index: 10;
+    padding: 20px;
+    max-width: 90%;
+}
+
+h1 {
+    font-size: 1.8rem;
+    color: #333;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.start-btn {
+    background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    font-size: 1.1rem;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    margin-top: 30px;
+    width: 80%;
+    max-width: 200px;
+}
+
+.start-btn:hover, .start-btn:active {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+.marble {
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle at 30% 30%, white, #a1c4fd);
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+}
+
+/* 关卡页面样式 */
+.level-container {
+    display: none;
+    text-align: center;
+    z-index: 10;
+    padding: 15px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.canvas-container {
+    position: relative;
+    margin: 15px auto;
+    width: 280px;
+    height: 330px;
+    background-color: white;
+    border: 2px solid #ddd;
+    overflow: hidden;
+    touch-action: none;
+}
+
+.knot {
+    position: absolute;
+    width: 35px;
+    height: 35px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 20;
+    pointer-events: auto;
+}
+
+/* 磁性扎结样式 */
+.knot-magnetic {
+    border: 2px solid #ff6b6b;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(255, 107, 107, 0.5);
+}
+
+/* 动态扎结样式 */
+.knot-dynamic {
+    border: 2px solid #4CAF50;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+    animation: rotate 5s linear infinite;
+}
+
+/* 变色扎结样式 */
+.knot-color-change {
+    border: 2px solid #FF9800;
+    border-radius: 50%;
+    box-shadow: 0 0 8px rgba(255, 152, 0, 0.7);
+    transition: all 0.5s ease;
+}
+
+/* 变色扎结-蓝色状态 */
+.knot-color-change.blue-state {
+    border-color: #2196F3;
+    box-shadow: 0 0 8px rgba(33, 150, 243, 0.7);
+}
+
+/* 变色扎结-红色状态 */
+.knot-color-change.red-state {
+    border-color: #f44336;
+    box-shadow: 0 0 8px rgba(244, 67, 54, 0.7);
+}
+
+/* 变色扎结-黄色状态 */
+.knot-color-change.yellow-state {
+    border-color: #FFEB3B;
+    box-shadow: 0 0 8px rgba(255, 235, 59, 0.7);
+}
+
+@keyframes rotate {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* 弹弓发射器样式 */
+.slingshot-container {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70px;
+    height: 70px;
+    z-index: 30;
+    cursor: pointer;
+    touch-action: none;
+}
+
+.slingshot {
+    width: 100%;
+    height: 100%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: relative;
+}
+
+/* 力度进度条容器 - 放在画布和弹珠选择之间 */
+.power-meter-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px auto 15px;
+    z-index: 40;
+    display: none;
+}
+
+.power-meter-container {
+    width: 200px;
+    height: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    border: 2px solid #a1c4fd;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin-bottom: 5px;
+}
+
+.power-meter-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #4CAF50, #FF9800, #FF5722);
+    border-radius: 8px;
+    transition: width 0.1s ease;
+}
+
+.power-meter-text {
+    font-weight: bold;
+    font-size: 0.8rem;
+    color: #333;
+    text-align: center;
+    height: 20px;
+    line-height: 20px;
+}
+
+/* 弹弓上的弹珠 */
+.slingshot-marble {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    z-index: 31;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.slingshot-marble-blue {
+    background: radial-gradient(circle at 30% 30%, white, #a1c4fd);
+}
+
+.slingshot-marble-red {
+    background: radial-gradient(circle at 30% 30%, white, #ff6b6b);
+}
+
+.slingshot-marble-yellow {
+    background: radial-gradient(circle at 30% 30%, white, #FFEB3B);
+}
+
+/* 弹弓的拉伸橡皮筋 */
+.rubber-band {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.8);
+    height: 3px;
+    border-radius: 2px;
+    z-index: 25;
+    pointer-events: none;
+    transition: background-color 0.3s ease;
+}
+
+/* 拖拽弹珠样式 */
+.drag-marble {
+    position: absolute;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    z-index: 32;
+    pointer-events: none;
+    box-shadow: 0 0 8px rgba(0,0,0,0.3);
+}
+
+.drag-marble-blue {
+    background: radial-gradient(circle at 30% 30%, white, #a1c4fd);
+}
+
+.drag-marble-red {
+    background: radial-gradient(circle at 30% 30%, white, #ff6b6b);
+}
+
+.drag-marble-yellow {
+    background: radial-gradient(circle at 30% 30%, white, #FFEB3B);
+}
+
+/* 飞行中的弹珠样式 */
+.flying-marble {
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    z-index: 10;
+    pointer-events: none;
+}
+
+.flying-marble-blue {
+    background: radial-gradient(circle at 30% 30%, white, #a1c4fd);
+}
+
+.flying-marble-red {
+    background: radial-gradient(circle at 30% 30%, white, #ff6b6b);
+}
+
+.flying-marble-yellow {
+    background: radial-gradient(circle at 30% 30%, white, #FFEB3B);
+}
+
+/* 小弹珠样式（黄色分裂后） */
+.small-marble {
+    width: 18px;
+    height: 18px;
+    z-index: 11;
+}
+
+/* 爆炸弹珠样式 */
+.flying-marble-explosion {
+    background: radial-gradient(circle at 30% 30%, #ffeb3b, #ff9800);
+    box-shadow: 0 0 12px rgba(255, 152, 0, 0.8);
+}
+
+/* 染色区域样式 */
+.dye-area {
+    position: absolute;
+    border-radius: 50%;
+    z-index: 5;
+    pointer-events: none;
+    transition: background 0.5s ease;
+}
+
+.dye-area-blue {
+    background: radial-gradient(circle, rgba(161,196,253,0.8) 0%, rgba(161,196,253,0.6) 100%);
+}
+
+.dye-area-red {
+    background: radial-gradient(circle, rgba(255,107,107,0.8) 0%, rgba(255,107,107,0.6) 100%);
+}
+
+.dye-area-yellow {
+    background: radial-gradient(circle, rgba(255,235,59,0.8) 0%, rgba(255,235,59,0.6) 100%);
+}
+
+.dye-area-purple {
+    background: radial-gradient(circle, rgba(171,130,255,0.8) 0%, rgba(171,130,255,0.6) 100%);
+    z-index: 6;
+}
+
+.dye-area-orange {
+    background: radial-gradient(circle, rgba(255,152,0,0.8) 0%, rgba(255,152,0,0.6) 100%);
+    z-index: 6;
+}
+
+/* 爆炸弹珠染色区域 */
+.dye-area-explosion-blue {
+    z-index: 7;
+    background: radial-gradient(circle, rgba(161,196,253,0.9) 0%, rgba(161,196,253,0.7) 100%);
+}
+
+.dye-area-explosion-red {
+    z-index: 7;
+    background: radial-gradient(circle, rgba(255,107,107,0.9) 0%, rgba(255,107,107,0.7) 100%);
+}
+
+/* 变色扎结影响区域 */
+.knot-influence-area {
+    position: absolute;
+    border-radius: 50%;
+    border: 1px dashed;
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 4;
+}
+
+.blue-influence {
+    border-color: #2196F3;
+}
+
+.red-influence {
+    border-color: #f44336;
+}
+
+.yellow-influence {
+    border-color: #FFEB3B;
+}
+
+.explosion {
+    position: absolute;
+    border-radius: 50%;
+    transform: scale(0);
+    animation: explode 0.5s forwards;
+    z-index: 15;
+}
+
+.explosion-blue {
+    background: rgba(161, 196, 253, 0.5);
+}
+
+.explosion-red {
+    background: rgba(255, 107, 107, 0.5);
+}
+
+/* 爆炸弹珠的爆炸效果 */
+.explosion-explosion-blue {
+    background: rgba(161, 196, 253, 0.7);
+    animation: explode 0.8s forwards;
+}
+
+.explosion-explosion-red {
+    background: rgba(255, 107, 107, 0.7);
+    animation: explode 0.8s forwards;
+}
+
+@keyframes explode {
+    to {
+        transform: scale(10);
+        opacity: 0;
+    }
+}
+
+/* 进度条容器 */
+.progress-container {
+    display: flex;
+    gap: 8px;
+    margin: 15px 0;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.progress-bar {
+    flex: 1;
+    min-width: 120px;
+    height: 16px;
+    background: #eee;
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* 混合区域进度条 */
+.mixed-progress-container {
+    display: flex;
+    gap: 5px;
+    margin: 8px 0;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.mixed-progress-bar {
+    flex: 1;
+    min-width: 100px;
+    height: 14px;
+    background: #eee;
+    border-radius: 7px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress {
+    height: 100%;
+    transition: width 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.65rem;
+    white-space: nowrap;
+}
+
+.progress-blue {
+    background: linear-gradient(45deg, #a1c4fd, #8ab4f8);
+}
+
+.progress-red {
+    background: linear-gradient(45deg, #ff6b6b, #fa5252);
+}
+
+.progress-yellow {
+    background: linear-gradient(45deg, #FFEB3B, #FFC107);
+}
+
+.progress-purple {
+    background: linear-gradient(45deg, #ab82ff, #9370db);
+}
+
+.progress-orange {
+    background: linear-gradient(45deg, #FF9800, #F57C00);
+}
+
+/* 弹珠选择区域 */
+.marble-selection {
+    margin: 15px 0 8px;
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.selectable-marble {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.selectable-marble:hover, .selectable-marble:active {
+    transform: scale(1.1);
+}
+
+.selectable-marble.active {
+    transform: scale(1.2);
+    box-shadow: 0 0 8px rgba(0,0,0,0.3);
+}
+
+.selectable-marble-blue {
+    background: radial-gradient(circle at 30% 30%, white, #a1c4fd);
+}
+
+.selectable-marble-red {
+    background: radial-gradient(circle at 30% 30%, white, #ff6b6b);
+}
+
+.selectable-marble-yellow {
+    background: radial-gradient(circle at 30% 30%, white, #FFEB3B);
+}
+
+/* 爆炸弹珠显示样式 */
+.selectable-marble-explosion {
+    position: relative;
+    box-shadow: 0 0 6px rgba(255, 152, 0, 0.6);
+}
+
+.selectable-marble-explosion::after {
+    content: "💥";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 7px;
+}
+
+/* 剩余弹珠显示样式 */
+.marbles-count {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 6px 0;
+    font-weight: bold;
+    font-size: 0.75rem;
+}
+
+.marble-count-blue {
+    color: #a1c4fd;
+}
+
+.marble-count-red {
+    color: #ff6b6b;
+}
+
+.marble-count-yellow {
+    color: #FFC107;
+}
+
+.marble-display {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 6px;
+    flex-wrap: wrap;
+}
+
+.display-marble {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    position: relative;
+}
+
+.display-marble-blue {
+    background: radial-gradient(circle at 30% 30%, white, #a1c4fd);
+}
+
+.display-marble-red {
+    background: radial-gradient(circle at 30% 30%, white, #ff6b6b);
+}
+
+.display-marble-yellow {
+    background: radial-gradient(circle at 30% 30%, white, #FFEB3B);
+}
+
+/* 爆炸弹珠显示样式 */
+.display-marble-explosion {
+    box-shadow: 0 0 5px rgba(255, 152, 0, 0.6);
+    position: relative;
+}
+
+.display-marble-explosion::after {
+    content: "💥";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 6px;
+}
+
+/* 过关提示样式 - 缩小版 */
+.win-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    z-index: 100;
+    text-align: center;
+    display: none;
+    width: 85%;
+    max-width: 300px;
+    border: 2px solid #a1c4fd;
+}
+
+.win-modal h2 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+    line-height: 1.4;
+}
+
+.win-modal p {
+    color: #666;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.win-modal button {
+    background: linear-gradient(45deg, #a1c4fd, #fbc2eb);
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin: 5px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    min-width: 100px;
+}
+
+.win-modal button:hover, .win-modal button:active {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+.win-modal .button-container {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+    flex-wrap: wrap;
+}
+
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    z-index: 99;
+    display: none;
+}
+
+/* 第二关爆炸弹珠选择弹窗 - 缩小版 */
+.explosion-choice-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    z-index: 101;
+    text-align: center;
+    display: none;
+    width: 85%;
+    max-width: 280px;
+    border: 2px solid #ff9800;
+}
+
+.explosion-choice-modal h2 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.2rem;
+}
+
+.explosion-choice-modal p {
+    color: #666;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.explosion-choice-modal .button-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 15px;
+}
+
+.explosion-choice-modal button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: bold;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    min-width: 80px;
+}
+
+.explosion-choice-modal .yes-btn {
+    background: linear-gradient(45deg, #FF9800, #FF5722);
+    color: white;
+}
+
+.explosion-choice-modal .no-btn {
+    background: linear-gradient(45deg, #a1c4fd, #8ab4f8);
+    color: white;
+}
+
+.explosion-choice-modal button:hover, .explosion-choice-modal button:active {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* 爆炸弹珠图标 */
+.explosion-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    display: block;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+/* 爆炸弹珠替换确认弹窗样式 */
+.explosion-confirm-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 15px 20px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    z-index: 101;
+    text-align: center;
+    display: none;
+    width: 80%;
+    max-width: 250px;
+}
+
+.explosion-confirm-modal p {
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.explosion-confirm-modal button {
+    padding: 8px 15px;
+    margin: 0 8px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.85rem;
+}
+
+.confirm-btn {
+    background: #ff9800;
+    color: white;
+}
+
+.cancel-btn {
+    background: #eee;
+    color: #333;
+}
+
+/* 关卡介绍页面 */
+.level-intro {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    padding: 20px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    z-index: 110;
+    text-align: center;
+    display: none;
+    width: 90%;
+    max-width: 400px;
+    max-height: 85vh;
+    overflow-y: auto;
+    border: 2px solid #a1c4fd;
+}
+
+.level-intro h2 {
+    color: #333;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
+
+.level-intro h3 {
+    color: #666;
+    margin: 15px 0 10px;
+    font-size: 1rem;
+    text-align: left;
+}
+
+.level-intro p {
+    color: #666;
+    margin-bottom: 15px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    text-align: left;
+}
+
+.level-intro ul {
+    text-align: left;
+    margin-left: 20px;
+    margin-bottom: 20px;
+    color: #666;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.level-intro li {
+    margin-bottom: 8px;
+}
+
+.level-intro button {
+    background: linear-gradient(45deg, #a1c4fd, #fbc2eb);
+    border: none;
+    color: white;
+    padding: 10px 25px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.level-intro button:hover, .level-intro button:active {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+}
+
+.condition-item {
+    background: rgba(161, 196, 253, 0.1);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border-left: 3px solid #a1c4fd;
+}
+
+.mechanism-item {
+    background: rgba(255, 107, 107, 0.1);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border-left: 3px solid #ff6b6b;
+}
+
+/* 返回按钮 */
+.back-btn {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: rgba(255,255,255,0.8);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 50;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* 音乐控制按钮 */
+.music-control {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: rgba(255,255,255,0.8);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 50;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.2rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* 移动端优化 */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+    
+    .canvas-container {
+        width: 260px;
+        height: 310px;
+    }
+    
+    .progress-bar {
+        min-width: 110px;
+    }
+    
+    .mixed-progress-bar {
+        min-width: 90px;
+    }
+    
+    .win-modal, .explosion-choice-modal, .level-intro {
+        width: 90%;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 360px) {
+    .canvas-container {
+        width: 240px;
+        height: 290px;
+    }
+    
+    .progress-bar {
+        min-width: 100px;
+    }
+}

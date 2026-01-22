@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>弹珠染色游戏</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- 只保留这一个 script 标签，删除 body 中的另一个 -->
+    <script src="game.js" defer></script>
+</head>
+<body>
+    <!-- 模糊色块背景 -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+    
+    <!-- 游戏主界面 -->
+    <div class="game-container">
+        <div class="marble"></div>
+        <h1>弹珠染色游戏</h1>
+        <button class="start-btn" onclick="startGame()">开始游戏</button>
+    </div>
+
+    <!-- 关卡一界面 -->
+    <div class="level-container" id="level1">
+        <button class="back-btn" onclick="playClickSound(); returnToMain()">←</button>
+        <button class="music-control" id="musicToggle1" onclick="playClickSound(); toggleMusic()">♪</button>
+        <h1>关卡一</h1>
+        
+        <div class="canvas-container" id="canvas1">
+            <img src="../移动应用实训/图片/画布.jpg" style="width:100%;height:100%;object-fit:cover">
+            <div class="knot" style="top:20%;left:20%;background-image:url('../移动应用实训/图片/扎结.png')" data-id="knot1"></div>
+            <div class="knot dyeable-area-trigger" style="top:60%;left:70%;background-image:url('../移动应用实训/图片/扎结.png')" data-id="knot2"></div>
+            <div class="slingshot-container" id="slingshot1">
+                <div class="slingshot" style="background-image:url('../移动应用实训/图片/弹弓发射器.png')"></div>
+                <div class="slingshot-marble slingshot-marble-blue" id="current-marble1"></div>
+            </div>
+        </div>
+        
+        <!-- 力度进度条 - 放在画布和弹珠选择之间 -->
+        <div class="power-meter-wrapper" id="power-wrapper1">
+            <div class="power-meter-container">
+                <div class="power-meter-fill" id="power-meter-fill1"></div>
+            </div>
+            <div class="power-meter-text" id="power-meter-text1">力度: 0%</div>
+        </div>
+        
+        <!-- 弹珠选择区域 -->
+        <div class="marble-selection" id="marble-selection1">
+            <div class="selectable-marble selectable-marble-blue active" data-color="blue"></div>
+            <div class="selectable-marble selectable-marble-blue" data-color="blue"></div>
+            <div class="selectable-marble selectable-marble-blue" data-color="blue"></div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress progress-blue" id="progress1">0%</div>
+        </div>
+        
+        <div id="marbles-left1">剩余弹珠: 3</div>
+    </div>
+
+    <!-- 关卡二界面 -->
+    <div class="level-container" id="level2">
+        <button class="back-btn" onclick="playClickSound(); returnToMain()">←</button>
+        <button class="music-control" id="musicToggle2" onclick="playClickSound(); toggleMusic()">♪</button>
+        <h1>关卡二</h1>
+        
+        <div class="canvas-container" id="canvas2">
+            <img src="../移动应用实训/图片/画布.jpg" style="width:100%;height:100%;object-fit:cover">
+            <!-- 三个扎结：普通×2 + 磁性×1 -->
+            <div class="knot" style="top:20%;left:20%;background-image:url('../移动应用实训/图片/扎结.png')" data-id="knot1"></div>
+            <div class="knot dyeable-area-trigger" style="top:60%;left:70%;background-image:url('../移动应用实训/图片/扎结.png')" data-id="knot2"></div>
+            <div class="knot knot-magnetic" style="top:40%;left:50%;transform:translate(-50%, -50%);background-image:url('../移动应用实训/图片/扎结.png')" data-id="knot3" data-magnetic="true"></div>
+            
+            <div class="slingshot-container" id="slingshot2">
+                <div class="slingshot" style="background-image:url('../移动应用实训/图片/弹弓发射器.png')"></div>
+                <div class="slingshot-marble slingshot-marble-blue" id="current-marble2"></div>
+            </div>
+        </div>
+        
+        <!-- 力度进度条 - 放在画布和弹珠选择之间 -->
+        <div class="power-meter-wrapper" id="power-wrapper2">
+            <div class="power-meter-container">
+                <div class="power-meter-fill" id="power-meter-fill2"></div>
+            </div>
+            <div class="power-meter-text" id="power-meter-text2">力度: 0%</div>
+        </div>
+        
+        <!-- 弹珠选择区域 -->
+        <div class="marble-selection" id="marble-selection2">
+            <div class="selectable-marble selectable-marble-blue active" data-color="blue"></div>
+            <div class="selectable-marble selectable-marble-blue" data-color="blue"></div>
+            <div class="selectable-marble selectable-marble-red" data-color="red"></div>
+            <div class="selectable-marble selectable-marble-red" data-color="red"></div>
+        </div>
+        
+        <!-- 进度条显示 -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress progress-blue" id="progress2-blue">0%</div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress progress-red" id="progress2-red">0%</div>
+            </div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress progress-purple" id="progress2-purple">混合区域: 0%</div>
+        </div>
+    </div>
+
+    <!-- 关卡三界面 -->
+    <div class="level-container" id="level3">
+        <button class="back-btn" onclick="playClickSound(); returnToMain()">←</button>
+        <button class="music-control" id="musicToggle3" onclick="playClickSound(); toggleMusic()">♪</button>
+        <h1>关卡三</h1>
+        
+        <div class="canvas-container" id="canvas3">
+            <img src="../移动应用实训/图片/画布.jpg" style="width:100%;height:100%;object-fit:cover">
+            <!-- 6个扎结：固定扎结×2 + 动态扎结×2 + 变色扎结×2 -->
+            <!-- 固定扎结 -->
+            <div class="knot" style="top:15%;left:20%;background-image:url('../移动应用实训/图片/扎结.png')" data-id="knot1"></div>
+            <div class="knot" style="top:70%;left:75%;background-image:url('../移动应用实训/图片/扎结.png')" data-id="knot6"></div>
+            
+            <!-- 动态扎结 - 调整位置避免重叠 -->
+            <div class="knot knot-dynamic" style="top:30%;left:65%;background-image:url('../移动应用实训/图片/扎结.png')" data-id="knot2" data-dynamic="true"></div>
+            <div class="knot knot-dynamic" style="top:55%;left:30%;background-image:url('../移动应用实训/图片/扎结.png')" data-id="knot3" data-dynamic="true"></div>
+            
+            <!-- 变色扎结 -->
+            <div class="knot knot-color-change blue-state" style="top:40%;left:45%;background-image:url('../移动应用实训/图片/扎结.png')" data-id="knot4" data-color-change="true" data-color="blue"></div>
+            <div class="knot knot-color-change red-state" style="top:40%;left:80%;background-image:url('../移动应用实训/图片/扎结.png')" data-id="knot5" data-color-change="true" data-color="red"></div>
+            
+            <div class="slingshot-container" id="slingshot3">
+                <div class="slingshot" style="background-image:url('../移动应用实训/图片/弹弓发射器.png')"></div>
+                <div class="slingshot-marble slingshot-marble-blue" id="current-marble3"></div>
+            </div>
+        </div>
+        
+        <!-- 力度进度条 - 放在画布和弹珠选择之间 -->
+        <div class="power-meter-wrapper" id="power-wrapper3">
+            <div class="power-meter-container">
+                <div class="power-meter-fill" id="power-meter-fill3"></div>
+            </div>
+            <div class="power-meter-text" id="power-meter-text3">力度: 0%</div>
+        </div>
+        
+        <!-- 弹珠选择区域 -->
+        <div class="marble-selection" id="marble-selection3">
+            <div class="selectable-marble selectable-marble-blue active" data-color="blue"></div>
+            <div class="selectable-marble selectable-marble-blue" data-color="blue"></div>
+            <div class="selectable-marble selectable-marble-blue" data-color="blue"></div>
+            <div class="selectable-marble selectable-marble-red" data-color="red"></div>
+            <div class="selectable-marble selectable-marble-red" data-color="red"></div>
+            <div class="selectable-marble selectable-marble-red" data-color="red"></div>
+            <div class="selectable-marble selectable-marble-yellow" data-color="yellow"></div>
+            <div class="selectable-marble selectable-marble-yellow" data-color="yellow"></div>
+        </div>
+        
+        <!-- 三色进度条 -->
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress progress-blue" id="progress3-blue">0%</div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress progress-red" id="progress3-red">0%</div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress progress-yellow" id="progress3-yellow">0%</div>
+            </div>
+        </div>
+        
+        <!-- 混合区域进度条 -->
+        <div class="mixed-progress-container">
+            <div class="mixed-progress-bar">
+                <div class="progress progress-purple" id="progress3-purple">紫: 0%</div>
+            </div>
+            <div class="mixed-progress-bar">
+                <div class="progress progress-orange" id="progress3-orange">橙: 0%</div>
+            </div>
+        </div>
+        
+        <div style="margin-top: 10px; font-size: 0.75rem; color: #666;">
+            提示：黄色弹珠撞击后会分裂！变色扎结会影响周围染色色彩。<br>
+            紫色=蓝+红，橙色=红+黄
+        </div>
+    </div>
+
+    <!-- 过关提示弹窗 -->
+    <div class="overlay" id="overlay"></div>
+    <div class="win-modal" id="winModal">
+        <h2 id="resultText">恭喜！你成功过关了！</h2>
+        <div id="rewardText"></div>
+        <div class="button-container">
+            <button id="nextLevelBtn" onclick="playClickSound(); goToNextLevel()">下一关</button>
+            <button onclick="playClickSound(); resetCurrentLevel()">重新开始</button>
+            <button onclick="playClickSound(); returnToMain()">返回主页</button>
+        </div>
+    </div>
+
+    <!-- 第二关爆炸弹珠选择弹窗 -->
+    <div class="explosion-choice-modal" id="explosionChoiceModal">
+        <div class="explosion-icon">💥</div>
+        <h2>爆炸弹珠</h2>
+        <p id="explosionChoiceText">恭喜通过第一关！是否在第二关使用爆炸弹珠？</p>
+        <div class="button-container">
+            <button class="yes-btn" onclick="playClickSound(); useExplosionMarble()">是</button>
+            <button class="no-btn" onclick="playClickSound(); skipExplosionMarble()">否</button>
+        </div>
+    </div>
+
+    <!-- 关卡介绍页面 -->
+    <div class="level-intro" id="levelIntro">
+        <h2 id="introTitle">关卡介绍</h2>
+        <div id="introContent"></div>
+        <button id="startLevelBtn" onclick="playClickSound(); startLevel()">开始游戏</button>
+    </div>
+
+    <!-- 删除这里的重复 script 标签 -->
+</body>
+</html>
